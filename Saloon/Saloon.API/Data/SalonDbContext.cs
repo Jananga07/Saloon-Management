@@ -11,4 +11,11 @@ public class SalonDbContext : DbContext
     }
 
     public DbSet<SalonService> SalonServices { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SalonService>()
+            .Property(s => s.Price)
+            .HasPrecision(18, 2);
+    }
 }

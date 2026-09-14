@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Saloon.API.Data;
 
@@ -10,9 +11,11 @@ using Saloon.API.Data;
 namespace Salon.API.Migrations
 {
     [DbContext(typeof(SalonDbContext))]
-    partial class SalonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260913170114_AddPricePrecision")]
+    partial class AddPricePrecision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

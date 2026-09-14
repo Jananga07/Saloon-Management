@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bJ7goqiqxWQ=",
+  "dgSpecHash": "zDMJFSGM0Hs=",
   "success": true,
-  "projectFilePath": "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\Salon.API.csproj",
+  "projectFilePath": "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\Salon.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\User\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
@@ -59,9 +59,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
-      "projectPath": "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\Salon.API.csproj",
+      "projectPath": "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\Salon.API.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\Salon.API.csproj",
+      "filePath": "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\Salon.API.csproj",
       "libraryId": "Microsoft.OpenApi",
       "targetGraphs": [
         "net10.0"
