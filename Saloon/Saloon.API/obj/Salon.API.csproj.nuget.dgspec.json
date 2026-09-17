@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\Salon.API.csproj": {}
+    "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\Salon.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\Salon.API.csproj": {
+    "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\Salon.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\Salon.API.csproj",
+        "projectUniqueName": "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\Salon.API.csproj",
         "projectName": "Salon.API",
-        "projectPath": "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\Salon.API.csproj",
+        "projectPath": "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\Salon.API.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\Desktop\\Saloon\\saloon\\Saloon.API\\obj\\",
+        "outputPath": "C:\\Users\\User\\Desktop\\Saloon\\Saloon\\Saloon.API\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"
