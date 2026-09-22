@@ -1,0 +1,91 @@
+.service-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+
+.service-card__image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.service-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-card__image img {
+  transform: scale(1.07);
+}
+
+.service-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+}
+
+.service-card__body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.service-card__icon-sm {
+  font-size: 1.4rem;
+}
+
+.service-card__body h3 {
+  font-size: 1.15rem;
+  color: var(--dark);
+  margin: 0;
+}
+
+.service-card__body p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.7;
+  flex: 1;
+}
+
+.service-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.service-card__price {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gold);
+  font-family: 'Arial', sans-serif;
+}
+
+.service-card__link {
+  font-size: 0.82rem;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 0.05em;
+  color: var(--charcoal);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.service-card__link:hover {
+  color: var(--gold);
+}
