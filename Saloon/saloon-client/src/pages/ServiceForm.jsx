@@ -35,7 +35,7 @@ export default function ServiceForm() {
       } else {
         await createService(payload);
       }
-      navigate('/');
+      navigate('/services');
     } catch (err) {
       setError(err.message);
     }
@@ -84,7 +84,7 @@ export default function ServiceForm() {
         </div>
         <div style={styles.actions}>
           <button type="submit" style={styles.submitBtn}>{isEdit ? 'Update' : 'Create'}</button>
-          <button type="button" onClick={() => navigate('/')} style={styles.cancelBtn}>Cancel</button>
+          <button type="button" onClick={() => navigate('/services')} style={styles.cancelBtn}>Cancel</button>
         </div>
       </form>
     </div>
@@ -92,7 +92,7 @@ export default function ServiceForm() {
 }
 
 const styles = {
-  container: { padding: '2rem', maxWidth: '500px', margin: '0 auto' },
+  container: { padding: '8rem 2rem 4rem', maxWidth: '500px', width: '100%', margin: '0 auto' },
   title: { marginBottom: '1.5rem', color: '#1a1a2e' },
   msg: { textAlign: 'center', marginTop: '2rem' },
   error: { color: 'red', marginBottom: '1rem' },

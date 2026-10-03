@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
+import { useAuth } from '../auth/useAuth';
 
 const navLinks = [
   { label: 'Home', to: '/' },
@@ -11,6 +12,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -48,13 +50,13 @@ export default function Navbar() {
             </a>
           ))}
           <div className="navbar__actions navbar__actions--mobile">
-            <Link to="/login" className="btn-outline btn-sm">Login</Link>
+            <Link to={user ? '/admin' : '/login'} className="btn-outline btn-sm" onClick={() => setMenuOpen(false)}>{user ? 'Dashboard' : 'Admin Login'}</Link>
             <Link to="/book" className="btn-primary btn-sm">Book Appointment</Link>
           </div>
         </nav>
 
         <div className="navbar__actions navbar__actions--desktop">
-          <Link to="/login" className="btn-outline btn-sm">Login</Link>
+          <Link to={user ? '/admin' : '/login'} className="btn-outline btn-sm">{user ? 'Dashboard' : 'Admin Login'}</Link>
           <Link to="/book" className="btn-primary btn-sm">Book Appointment</Link>
         </div>
 

@@ -11,6 +11,7 @@ public class SalonDbContext : DbContext
     }
 
     public DbSet<SalonService> SalonServices { get; set; }
+    public DbSet<AdminUser> AdminUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

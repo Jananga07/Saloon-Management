@@ -1,37 +1,29 @@
-const BASE_URL = 'http://localhost:5097/api/salonservices';
+import { request } from './client';
 
 export async function getServices() {
-  const res = await fetch(BASE_URL);
-  if (!res.ok) throw new Error('Failed to fetch services');
-  return res.json();
+  return request('/salonservices');
 }
 
 export async function getService(id) {
-  const res = await fetch(`${BASE_URL}/${id}`);
-  if (!res.ok) throw new Error('Failed to fetch service');
-  return res.json();
+  return request(`/salonservices/${id}`);
 }
 
 export async function createService(data) {
-  const res = await fetch(BASE_URL, {
+  return request('/salonservices', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Failed to create service');
-  return res.json();
 }
 
 export async function updateService(id, data) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
+  return request(`/salonservices/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Failed to update service');
 }
 
 export async function deleteService(id) {
-  const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error('Failed to delete service');
+  return request(`/salonservices/${id}`, { method: 'DELETE' });
 }

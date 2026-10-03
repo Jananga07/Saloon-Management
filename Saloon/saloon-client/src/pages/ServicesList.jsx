@@ -16,16 +16,20 @@ export default function ServicesList() {
 
   async function handleDelete(id) {
     if (!confirm('Delete this service?')) return;
-    await deleteService(id);
-    setServices((prev) => prev.filter((s) => s.id !== id));
+    try {
+      await deleteService(id);
+      setServices((prev) => prev.filter((s) => s.id !== id));
+    } catch (failure) { setError(failure.message); }
   }
 
   if (loading) return <p style={styles.msg}>Loading...</p>;
-  if (error) return <p style={{ ...styles.msg, color: 'red' }}>{error}</p>;
 
   return (
     <div style={styles.container}>
+      <Link to="/admin">← Dashboard</Link>
       <h1 style={styles.title}>Salon Services</h1>
+      <Link to="/services/new" className="btn-primary" style={{ marginBottom: '1rem' }}>Add Service</Link>
+      {error && <p role="alert" className="admin-error">{error}</p>}
       {services.length === 0 ? (
         <p style={styles.msg}>No services yet. <Link to="/services/new">Add one</Link>.</p>
       ) : (
@@ -60,7 +64,7 @@ export default function ServicesList() {
 }
 
 const styles = {
-  container: { padding: '2rem', maxWidth: '900px', margin: '0 auto' },
+  container: { padding: '8rem 2rem 4rem', maxWidth: '1100px', width: '100%', margin: '0 auto', overflowX: 'auto' },
   title: { marginBottom: '1.5rem', color: '#1a1a2e' },
   msg: { textAlign: 'center', marginTop: '2rem' },
   table: { width: '100%', borderCollapse: 'collapse' },

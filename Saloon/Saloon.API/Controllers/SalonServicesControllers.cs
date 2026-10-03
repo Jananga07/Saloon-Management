@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Saloon.API.Data;
 using Saloon.API.Models;
@@ -41,6 +42,8 @@ public class SalonServicesController : ControllerBase
 
     //POST: api/SalonServices
     [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<ActionResult<SalonService>> CreateService(
         SalonService service)
     {
@@ -56,6 +59,8 @@ public class SalonServicesController : ControllerBase
 
     //PUT: api/SalonServices/1
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateService(
         int id,
         SalonService service)
@@ -74,6 +79,8 @@ public class SalonServicesController : ControllerBase
 
     //DELETE : api/SalonServices/1
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteService(int id)
     {
         var service = await _context.SalonServices.FindAsync(id);
