@@ -1,5 +1,13 @@
 import { request } from './client';
 
+export function uploadServicePhoto(id, photo) {
+  const body = new FormData();
+  body.append('photo', photo);
+  return request(`/salonservices/${id}/photo`, { method: 'POST', body });
+}
+
+export const removeServicePhoto = (id) => request(`/salonservices/${id}/photo`, { method: 'DELETE' });
+
 export async function getServices() {
   return request('/salonservices');
 }

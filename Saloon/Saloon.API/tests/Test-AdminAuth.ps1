@@ -1,3 +1,4 @@
+param([string]$Configuration = 'PhotoUpdate')
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Net.Http
 $projectRoot = Split-Path -Parent $PSScriptRoot
@@ -32,11 +33,11 @@ function Send-Request($httpClient, $method, $path, $data, $useCsrf = $true) {
 }
 
 try {
-    & dotnet ef database update --no-build --configuration AdminUpdate --project $project --connection $connection
+    & dotnet ef database update --no-build --configuration $Configuration --project $project --connection $connection
     if ($LASTEXITCODE -ne 0) { throw 'Test database migration failed.' }
     $env:ConnectionStrings__DefaultConnection = $connection
     $env:ASPNETCORE_ENVIRONMENT = 'Development'
-    $dll = Join-Path $projectRoot 'bin\AdminUpdate\net10.0\Salon.API.dll'
+    $dll = Join-Path $projectRoot "bin\$Configuration\net10.0\Salon.API.dll"
     $apiProcess = Start-Process -FilePath 'dotnet' -ArgumentList @($dll, '--urls', 'http://localhost:5098') -WorkingDirectory $projectRoot -WindowStyle Hidden -PassThru
     $handler = [System.Net.Http.HttpClientHandler]::new()
     $handler.CookieContainer = [System.Net.CookieContainer]::new()
@@ -74,9 +75,39 @@ try {
     $response = Send-Request $client 'POST' '/salonservices' $service
     Assert-Status $response 201 'Admin creates service'
     $created = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+    $photoBytes = [Convert]::FromBase64String('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aT1sAAAAASUVORK5CYII=')
+    function Send-Photo($httpClient, $bytes, $useCsrf = $true) {
+        $request = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::Post, "$baseUrl/salonservices/$($created.id)/photo")
+        $multipart = [System.Net.Http.MultipartFormDataContent]::new()
+        $content = [System.Net.Http.ByteArrayContent]::new($bytes)
+        $content.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::new('image/png')
+        $multipart.Add($content, 'photo', 'test.png')
+        $request.Content = $multipart
+        if ($useCsrf) {
+            $token = ($httpClient.GetAsync("$baseUrl/auth/csrf").Result.Content.ReadAsStringAsync().Result | ConvertFrom-Json).token
+            $request.Headers.Add('X-CSRF-Token', $token)
+        }
+        return $httpClient.SendAsync($request).Result
+    }
+    Assert-Status (Send-Photo $anonymous $photoBytes $false) 401 'Anonymous photo upload denied'
+    Assert-Status (Send-Photo $client $photoBytes $false) 400 'Photo upload requires CSRF token'
+    Assert-Status (Send-Photo $client ([Text.Encoding]::UTF8.GetBytes('fake photo'))) 400 'Invalid photo contents rejected'
+    Assert-Status (Send-Photo $client ([byte[]]::new(5 * 1024 * 1024 + 1))) 400 'Oversized photo rejected'
+    Assert-Status (Send-Photo $client $photoBytes) 200 'Admin uploads service photo'
+    $response = Send-Request $anonymous 'GET' "/salonservices/$($created.id)/photo" $null
+    Assert-Status $response 200 'Public service photo display'
+    if ($response.Content.Headers.ContentType.MediaType -ne 'image/png') { throw 'Wrong photo content type.' }
+    if ([Convert]::ToBase64String($response.Content.ReadAsByteArrayAsync().Result) -ne [Convert]::ToBase64String($photoBytes)) { throw 'Photo bytes changed.' }
     $service.id = $created.id
     $service.category = 'Ladies'
     Assert-Status (Send-Request $client 'PUT' "/salonservices/$($created.id)" $service) 204 'Admin updates service'
+    Assert-Status (Send-Request $anonymous 'GET' "/salonservices/$($created.id)/photo" $null) 200 'Editing service preserves photo'
+    $response = Send-Request $anonymous 'GET' "/salonservices/$($created.id)" $null
+    $summary = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+    if (!$summary.imageUrl -or $summary.PSObject.Properties.Name -contains 'photo') { throw 'Service summary must include image URL without photo bytes.' }
+    Assert-Status (Send-Request $anonymous 'DELETE' "/salonservices/$($created.id)/photo" $null $false) 401 'Anonymous photo removal denied'
+    Assert-Status (Send-Request $client 'DELETE' "/salonservices/$($created.id)/photo" $null) 204 'Admin removes photo'
+    Assert-Status (Send-Request $anonymous 'GET' "/salonservices/$($created.id)/photo" $null) 404 'Removed photo unavailable'
     Assert-Status (Send-Request $client 'DELETE' "/salonservices/$($created.id)" $null) 204 'Admin deletes service'
     Assert-Status (Send-Request $client 'POST' '/auth/logout' $null) 204 'Logout'
     Assert-Status (Send-Request $client 'POST' '/salonservices' $service) 401 'Writes denied after logout'

@@ -47,7 +47,7 @@ export default function ServicesList() {
                 <td style={styles.td}>{s.name}</td>
                 <td style={styles.td}>{s.category || 'Unisex'}</td>
                 <td style={styles.td}>{s.description}</td>
-                <td style={styles.td}>${s.price.toFixed(2)}</td>
+                <td style={styles.td}>Rs. {s.price.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 <td style={styles.td}>{s.durationMinutes} min</td>
                 <td style={styles.td}>{s.isActive ? '✅' : '❌'}</td>
                 <td style={styles.td}>

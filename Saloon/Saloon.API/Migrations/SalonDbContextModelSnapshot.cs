@@ -69,6 +69,13 @@ namespace Salon.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("PhotoContentType")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");

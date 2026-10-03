@@ -1,4 +1,5 @@
 import './ServiceCard.css';
+import { imageUrl } from '../api/client';
 
 const icons = {
   'Hair Styling': '✂️',
@@ -16,7 +17,7 @@ const images = {
 
 export default function ServiceCard({ service }) {
   const icon = icons[service.name] || '💆';
-  const image = images[service.name];
+  const image = imageUrl(service.imageUrl) || images[service.name];
 
   return (
     <div className="service-card">
@@ -33,7 +34,7 @@ export default function ServiceCard({ service }) {
         <h3>{service.name}</h3>
         <p>{service.description}</p>
         <div className="service-card__footer">
-          <span className="service-card__price">From ${service.price}</span>
+          <span className="service-card__price">From Rs. {service.price.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           <a href="#contact" className="service-card__link">Learn More →</a>
         </div>
       </div>

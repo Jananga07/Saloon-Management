@@ -2,7 +2,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5097/api';
 
 export async function request(path, options = {}) {
   const headers = { ...options.headers };
-  if (options.body) headers['Content-Type'] = 'application/json';
+  if (options.body && !(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
   if (options.method && !['GET', 'HEAD'].includes(options.method)) {
     const csrf = await fetch(`${API_URL}/auth/csrf`, { credentials: 'include' });
     if (!csrf.ok) throw new Error('Unable to start a secure request. Please try again.');
@@ -18,4 +18,8 @@ export async function request(path, options = {}) {
     throw error;
   }
   return response.status === 204 ? undefined : response.json();
+}
+
+export function imageUrl(path) {
+  return path ? new URL(path, API_URL).href : null;
 }
