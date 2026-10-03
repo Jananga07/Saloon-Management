@@ -14,6 +14,7 @@ export async function fetchServices() {
       {
         id: 1,
         name: 'Hair Styling',
+        category: 'Gents',
         description: 'Expert cuts, blowouts, and styling for every occasion.',
         price: 65,
         durationMinutes: 60,
@@ -22,6 +23,7 @@ export async function fetchServices() {
       {
         id: 2,
         name: 'Hair Coloring',
+        category: 'Ladies',
         description: 'Vibrant color, balayage, highlights, and toning services.',
         price: 120,
         durationMinutes: 120,
@@ -30,6 +32,7 @@ export async function fetchServices() {
       {
         id: 3,
         name: 'Facial & Skin Care',
+        category: 'Unisex',
         description: 'Revitalizing facials and skin treatments for a radiant glow.',
         price: 85,
         durationMinutes: 75,
@@ -38,6 +41,7 @@ export async function fetchServices() {
       {
         id: 4,
         name: 'Manicure & Pedicure',
+        category: 'Ladies',
         description: 'Luxury nail care with premium products for flawless results.',
         price: 55,
         durationMinutes: 60,

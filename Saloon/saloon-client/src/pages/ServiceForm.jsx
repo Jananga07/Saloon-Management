@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getService, createService, updateService } from '../api/services';
 
-const empty = { name: '', description: '', price: '', durationMinutes: '', isActive: true };
+const empty = { name: '', description: '', category: 'Unisex', price: '', durationMinutes: '', isActive: true };
 
 export default function ServiceForm() {
   const { id } = useParams();
@@ -15,7 +15,7 @@ export default function ServiceForm() {
   useEffect(() => {
     if (!isEdit) return;
     getService(id)
-      .then((s) => setForm({ ...s, price: String(s.price), durationMinutes: String(s.durationMinutes) }))
+      .then((s) => setForm({ ...s, category: s.category || 'Unisex', price: String(s.price), durationMinutes: String(s.durationMinutes) }))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [id, isEdit]);
@@ -48,6 +48,14 @@ export default function ServiceForm() {
       <h1 style={styles.title}>{isEdit ? 'Edit Service' : 'New Service'}</h1>
       {error && <p style={styles.error}>{error}</p>}
       <form onSubmit={handleSubmit} style={styles.form}>
+        <div style={styles.field}>
+          <label htmlFor="service-category" style={styles.label}>Category</label>
+          <select id="service-category" name="category" value={form.category} onChange={handleChange} required style={styles.input}>
+            {['Gents', 'Ladies', 'Unisex'].map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </div>
         {[
           { label: 'Name', name: 'name', type: 'text', required: true },
           { label: 'Description', name: 'description', type: 'text' },

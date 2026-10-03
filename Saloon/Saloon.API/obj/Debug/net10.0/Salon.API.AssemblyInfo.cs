@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Salon.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+42e91660f67edea03980706a2b71621bd4fad9a9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6644cdf042a55f04124ee7125a069aed1dda302e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Salon.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Salon.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

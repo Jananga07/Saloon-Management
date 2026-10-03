@@ -95,11 +95,21 @@ export default function Home() {
             Discover professional treatments designed to make you look and feel your absolute best.
           </p>
         </div>
-        <div className="services-grid">
-          {services.map((s) => (
-            <ServiceCard key={s.id} service={s} />
-          ))}
-        </div>
+        {['Gents', 'Ladies', 'Unisex'].map((category) => {
+          const categoryServices = services.filter((service) => (service.category || 'Unisex') === category);
+          return (
+            <div className="service-category" key={category}>
+              <h3 className="service-category__title">{category} Services</h3>
+              {categoryServices.length > 0 ? (
+                <div className="services-grid">
+                  {categoryServices.map((service) => <ServiceCard key={service.id} service={service} />)}
+                </div>
+              ) : (
+                <p className="service-category__empty">Services for this category will be available soon.</p>
+              )}
+            </div>
+          );
+        })}
       </section>
 
       {/* ABOUT */}

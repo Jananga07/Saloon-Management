@@ -32,7 +32,7 @@ export default function ServicesList() {
         <table style={styles.table}>
           <thead>
             <tr>
-              {['Name', 'Description', 'Price', 'Duration', 'Active', 'Actions'].map((h) => (
+              {['Name', 'Category', 'Description', 'Price', 'Duration', 'Active', 'Actions'].map((h) => (
                 <th key={h} style={styles.th}>{h}</th>
               ))}
             </tr>
@@ -41,6 +41,7 @@ export default function ServicesList() {
             {services.map((s) => (
               <tr key={s.id} style={styles.tr}>
                 <td style={styles.td}>{s.name}</td>
+                <td style={styles.td}>{s.category || 'Unisex'}</td>
                 <td style={styles.td}>{s.description}</td>
                 <td style={styles.td}>${s.price.toFixed(2)}</td>
                 <td style={styles.td}>{s.durationMinutes} min</td>

@@ -311,6 +311,21 @@
   background: var(--gold-light);
 }
 
+.service-category + .service-category {
+  margin-top: 3rem;
+}
+
+.service-category__title {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.service-category__empty {
+  color: var(--muted);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1100px) {
   .services-grid { grid-template-columns: repeat(2, 1fr); }

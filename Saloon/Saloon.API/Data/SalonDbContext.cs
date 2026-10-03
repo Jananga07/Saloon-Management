@@ -15,6 +15,11 @@ public class SalonDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<SalonService>()
+            .Property(s => s.Category)
+            .HasMaxLength(20)
+            .HasDefaultValue("Unisex");
+
+        modelBuilder.Entity<SalonService>()
             .Property(s => s.Price)
             .HasPrecision(18, 2);
     }
