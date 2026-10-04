@@ -96,7 +96,7 @@ export default function Home() {
           </p>
         </div>
         {['Gents', 'Ladies', 'Unisex'].map((category) => {
-          const categoryServices = services.filter((service) => (service.category || 'Unisex') === category);
+          const categoryServices = services.filter((service) => service.isActive && (service.category || 'Unisex') === category);
           return (
             <div className="service-category" key={category}>
               <h3 className="service-category__title">{category} Services</h3>

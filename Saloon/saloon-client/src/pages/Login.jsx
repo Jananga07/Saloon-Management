@@ -12,7 +12,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const from = location.state?.from || '';
-  const destination = ['/admin', '/services', '/services/new'].includes(from) || /^\/services\/edit\/\d+$/.test(from) ? from : '/admin';
+  const destination = ['/admin', '/admin/bookings', '/services', '/services/new'].includes(from) || /^\/services\/edit\/\d+$/.test(from) ? from : '/admin';
   if (auth.loading) return <main className="admin-page"><p>Loading...</p></main>;
   if (auth.user) return <Navigate to={destination} replace />;
   if (auth.error) return <main className="admin-page"><p role="alert">{auth.error}</p><button className="btn-outline" onClick={auth.refresh}>Try Again</button></main>;

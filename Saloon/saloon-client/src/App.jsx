@@ -10,6 +10,8 @@ import { AuthProvider } from './auth/AuthContext';
 import RequireAdmin from './auth/RequireAdmin';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
+import BookAppointment from './pages/BookAppointment';
+import ManageBookings from './pages/ManageBookings';
 
 export default function App() {
   return (
@@ -19,8 +21,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/book" element={<BookAppointment />} />
         <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/bookings" element={<ManageBookings />} />
           <Route path="/services" element={<ServicesList />} />
           <Route path="/services/new" element={<ServiceForm />} />
           <Route path="/services/edit/:id" element={<ServiceForm />} />

@@ -31,6 +31,9 @@ export default function AdminDashboard() {
       <div className="admin-panel"><h2>Service Management</h2><p>Add new services or update prices, durations, and categories.</p>
         <div className="admin-actions"><Link className="btn-primary" to="/services/new">Add Service</Link><Link className="btn-outline" to="/services">Manage Services</Link><Link className="btn-outline" to="/">View Website</Link></div>
       </div>
+      <div className="admin-panel" style={{ marginTop: '1.5rem' }}><h2>Appointment Management</h2><p>Review customer booking requests and confirm or cancel appointments.</p>
+        <div className="admin-actions"><Link className="btn-primary" to="/admin/bookings">Manage Appointments</Link><Link className="btn-outline" to="/book">Open Booking Page</Link></div>
+      </div>
     </main>
   );
 }

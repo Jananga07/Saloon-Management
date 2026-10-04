@@ -1,4 +1,4 @@
-param([string]$Configuration = 'PhotoUpdate')
+param([string]$Configuration = 'BookingUpdate')
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Net.Http
 $projectRoot = Split-Path -Parent $PSScriptRoot
@@ -108,7 +108,76 @@ try {
     Assert-Status (Send-Request $anonymous 'DELETE' "/salonservices/$($created.id)/photo" $null $false) 401 'Anonymous photo removal denied'
     Assert-Status (Send-Request $client 'DELETE' "/salonservices/$($created.id)/photo" $null) 204 'Admin removes photo'
     Assert-Status (Send-Request $anonymous 'GET' "/salonservices/$($created.id)/photo" $null) 404 'Removed photo unavailable'
+    # Customer booking and admin appointment management.
+    $service.durationMinutes = 60
+    Assert-Status (Send-Request $client 'PUT' "/salonservices/$($created.id)" $service) 204 'Set booking service duration'
+    $date = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromMinutes(330)).AddDays(2).ToString('yyyy-MM-dd')
+    $response = Send-Request $anonymous 'GET' "/bookings/availability?serviceId=$($created.id)&date=$date" $null
+    Assert-Status $response 200 'Customer sees available appointment times'
+    $availability = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+    if (!$availability.times -or $availability.timeZone -ne 'Asia/Colombo') { throw 'Expected Sri Lankan appointment times.' }
+    $booking = @{ serviceId=$created.id; date=$date; time=$availability.times[0]; customerName='Booking Test'; phone='077 123 4567'; email='test@example.com'; notes='Integration test'; requestKey=[Guid]::NewGuid().ToString() }
+    Assert-Status (Send-Request $anonymous 'POST' '/bookings' $booking $false) 400 'Booking requires CSRF token'
+    $invalid = $booking.Clone(); $invalid.phone='abc'
+    Assert-Status (Send-Request $anonymous 'POST' '/bookings' $invalid) 400 'Invalid customer phone rejected'
+    $invalid = $booking.Clone(); $invalid.date='2020-01-01'
+    Assert-Status (Send-Request $anonymous 'POST' '/bookings' $invalid) 400 'Past booking rejected'
+    $invalid = $booking.Clone(); $invalid.time='23:00'
+    Assert-Status (Send-Request $anonymous 'POST' '/bookings' $invalid) 400 'Booking outside opening hours rejected'
+    $invalid = $booking.Clone(); $invalid.time='09:15'
+    Assert-Status (Send-Request $anonymous 'POST' '/bookings' $invalid) 400 'Off-grid appointment time rejected'
+    $response = Send-Request $anonymous 'POST' '/bookings' $booking
+    Assert-Status $response 201 'Customer books without login'
+    $receipt = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+    if ($receipt.status -ne 'Pending' -or $receipt.price -ne 10 -or $receipt.durationMinutes -ne 60) { throw 'Wrong booking snapshot or initial status.' }
+    $response = Send-Request $anonymous 'POST' '/bookings' $booking
+    Assert-Status $response 200 'Retry does not create duplicate booking'
+    if (($response.Content.ReadAsStringAsync().Result | ConvertFrom-Json).reference -ne $receipt.reference) { throw 'Retry produced a different reference.' }
+    $overlap = $booking.Clone(); $overlap.requestKey=[Guid]::NewGuid().ToString()
+    $overlap.time = ([DateTime]::ParseExact($booking.time, 'HH:mm', $null)).AddMinutes(30).ToString('HH:mm')
+    Assert-Status (Send-Request $anonymous 'POST' '/bookings' $overlap) 409 'Overlapping duration blocked'
+    $response = Send-Request $anonymous 'GET' "/bookings/availability?serviceId=$($created.id)&date=$date" $null
+    $remaining = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+    if ($remaining.times -contains $booking.time -or $remaining.times -contains $overlap.time) { throw 'Occupied appointment times still visible.' }
+    Write-Output 'PASS: Occupied times hidden from availability'
+    Assert-Status (Send-Request $anonymous 'GET' '/bookings' $null) 401 'Customer contact details are admin-only'
+    $response = Send-Request $client 'GET' "/bookings?date=$date&status=Pending" $null
+    Assert-Status $response 200 'Admin lists pending bookings'
+    $entries = @($response.Content.ReadAsStringAsync().Result | ConvertFrom-Json)
+    if ($entries.Count -ne 1 -or $entries[0].phone -ne $booking.phone) { throw 'Expected exactly one booking with contact details.' }
+    $bookingId = $entries[0].id
+    Assert-Status (Send-Request $anonymous 'PATCH' "/bookings/$bookingId/status" @{status='Confirmed'}) 401 'Anonymous appointment confirmation denied'
+    Assert-Status (Send-Request $client 'PATCH' "/bookings/$bookingId/status" @{status='Confirmed'} $false) 400 'Admin appointment changes require CSRF token'
+    Assert-Status (Send-Request $client 'PATCH' "/bookings/$bookingId/status" @{status='Confirmed'}) 200 'Admin confirms booking'
+    Assert-Status (Send-Request $client 'PATCH' "/bookings/$bookingId/status" @{status='Cancelled'}) 200 'Admin cancels booking'
+    Assert-Status (Send-Request $client 'PATCH' "/bookings/$bookingId/status" @{status='Confirmed'}) 409 'Cancelled booking cannot be reopened'
+    $response = Send-Request $anonymous 'GET' "/bookings/availability?serviceId=$($created.id)&date=$date" $null
+    if (($response.Content.ReadAsStringAsync().Result | ConvertFrom-Json).times -notcontains $booking.time) { throw 'Cancellation did not free the time slot.' }
+    Write-Output 'PASS: Cancellation releases appointment time'
+    # Two independent requests for the same time must not both succeed.
+    $csrf = ($anonymous.GetAsync("$baseUrl/auth/csrf").Result.Content.ReadAsStringAsync().Result | ConvertFrom-Json).token
+    $tasks = @()
+    foreach ($attempt in 1..2) {
+        $concurrent = $booking.Clone(); $concurrent.requestKey=[Guid]::NewGuid().ToString()
+        $httpRequest = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::Post, "$baseUrl/bookings")
+        $httpRequest.Headers.Add('X-CSRF-Token', $csrf)
+        $httpRequest.Content = [System.Net.Http.StringContent]::new(($concurrent | ConvertTo-Json -Compress), [Text.Encoding]::UTF8, 'application/json')
+        $tasks += $anonymous.SendAsync($httpRequest)
+    }
+    [System.Threading.Tasks.Task]::WaitAll([System.Threading.Tasks.Task[]]$tasks)
+    $codes = @($tasks | ForEach-Object { [int]$_.Result.StatusCode } | Sort-Object)
+    if ($codes.Count -ne 2 -or $codes[0] -ne 201 -or $codes[1] -ne 409) { throw "Concurrent booking protection failed: $codes" }
+    Write-Output 'PASS: Simultaneous booking requests cannot double-book'
+    $service.isActive=$false
+    Assert-Status (Send-Request $client 'PUT' "/salonservices/$($created.id)" $service) 204 'Deactivate booking service'
+    $inactive = $booking.Clone(); $inactive.requestKey=[Guid]::NewGuid().ToString(); $inactive.time=$remaining.times[-1]
+    Assert-Status (Send-Request $anonymous 'POST' '/bookings' $inactive) 400 'Inactive service cannot be booked'
     Assert-Status (Send-Request $client 'DELETE' "/salonservices/$($created.id)" $null) 204 'Admin deletes service'
+    $response = Send-Request $client 'GET' "/bookings?date=$date" $null
+    Assert-Status $response 200 'Admin can read appointment history after service deletion'
+    $history = $response.Content.ReadAsStringAsync().Result | ConvertFrom-Json
+    if ($history.Count -ne 2 -or $history[0].serviceName -ne 'Auth Test') { throw "Appointment history assertion failed: expected 2 Auth Test entries, found $($history.Count)." }
+    Write-Output 'PASS: Service deletion preserves appointment history'
     Assert-Status (Send-Request $client 'POST' '/auth/logout' $null) 204 'Logout'
     Assert-Status (Send-Request $client 'POST' '/salonservices' $service) 401 'Writes denied after logout'
     # Restart only the test API to reset its in-memory rate limiter.

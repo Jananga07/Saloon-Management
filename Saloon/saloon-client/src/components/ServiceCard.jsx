@@ -1,5 +1,6 @@
 import './ServiceCard.css';
 import { imageUrl } from '../api/client';
+import { Link } from 'react-router-dom';
 
 const icons = {
   'Hair Styling': '✂️',
@@ -35,7 +36,7 @@ export default function ServiceCard({ service }) {
         <p>{service.description}</p>
         <div className="service-card__footer">
           <span className="service-card__price">From Rs. {service.price.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-          <a href="#contact" className="service-card__link">Learn More →</a>
+          <Link to={`/book?serviceId=${service.id}`} className="service-card__link">Book Now →</Link>
         </div>
       </div>
     </div>
